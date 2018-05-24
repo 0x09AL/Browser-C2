@@ -1,10 +1,9 @@
-var agentName = "Agent1"
-var url = "http://localhost:8080/" // URL of the Remote Endpoint
-var local_url = "http://127.0.0.1:8081/" // URL of the Agent Local Endpoint
+var agentName;
+var url = "http://localhost:8080/"; // URL of the Remote Endpoint
+var local_url = "http://127.0.0.1:8081/"; // URL of the Agent Local Endpoint
 
 
 //Improvements : Check if the response for each of them is OK.
-
 
 function DoCallback() {
     var xmlHttp = new XMLHttpRequest();
@@ -52,12 +51,11 @@ function SendResponse() {
 
 }
 
+function Start(agent_name){
 
-function Start(){
+    agentName = agent_name;
     DoCallback();
     SendCommands();
     SendResponse();
-    setTimeout(Start, 5000);
+    setTimeout(Start, 5000,agent_name);
 }
-
-Start()

@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 	"encoding/json"
+	"bytes"
 )
 
 type Agent struct{
@@ -87,11 +88,17 @@ func RemoveInactiveAgents(){
 
 func GetIndex(w http.ResponseWriter, r *http.Request){
 
+	// Validate the AGENT name to remove attack surface
+	vars := mux.Vars(r)
+	name := vars["agent"]
+
 	b, err := ioutil.ReadFile("static/index.html")
+
+	index := bytes.Replace(b,[]byte("{AGENT_NAME}"),[]byte(name),1)
 	if err != nil {
 		log.Fatal(err)
 	}
-	w.Write(b)
+	w.Write(index)
 }
 func GetJS(w http.ResponseWriter, r *http.Request){
 
@@ -121,7 +128,7 @@ func PrintData(w http.ResponseWriter, r *http.Request){
 func StartHTTPListener(port int)  {
 
 	listener := mux.NewRouter()
-	listener.HandleFunc("/",GetIndex).Methods("GET")
+	listener.HandleFunc("/main/{agent}",GetIndex).Methods("GET")
 	listener.HandleFunc("/jquery.js",GetJS).Methods("GET")
 	listener.HandleFunc("/callback/{agent}",AddAgent).Methods("GET")
 	listener.HandleFunc("/commands/{agent}",GetCommands).Methods("GET")
