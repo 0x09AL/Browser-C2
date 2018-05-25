@@ -1,5 +1,5 @@
 var agentName;
-var url = "http://localhost:8080/"; // URL of the Remote Endpoint
+var url = "http://?.?.?.?:8080/"; // URL of the Remote Endpoint
 var local_url = "http://127.0.0.1:8081/"; // URL of the Agent Local Endpoint
 
 

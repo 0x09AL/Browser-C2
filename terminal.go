@@ -25,8 +25,7 @@ var MainCompleter = readline.NewPrefixCompleter(
 var AgentCompleter = readline.NewPrefixCompleter(
 	readline.PcItem("whoami"),
 	readline.PcItem("tasklist"),
-	readline.PcItem("exec"),
-	readline.PcItem("shell"),
+	readline.PcItem("ipconfig"),
 	readline.PcItem("back"),
 )
 

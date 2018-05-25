@@ -25,6 +25,7 @@ func AddAgent(w http.ResponseWriter, r *http.Request){
 	vars := mux.Vars(r)
 	name := vars["agent"]
 	currentTime := time.Now().Unix()
+
 	newAgent = true
 
 	_, exists := Agents[name]
@@ -68,7 +69,11 @@ func PrintAgents(){
 	}
 	fmt.Println("\nActive Agents\n")
 	for _,agent := range Agents{
-		fmt.Println(fmt.Sprintf("Name : %s \t Last Callback: %d \t First Callback: %d",agent.Name,agent.LastCallBack,agent.LastCallBack))
+
+		LastCallback := time.Unix(agent.LastCallBack, 0)
+		FirstCallback := time.Unix(agent.FirstCallBack, 0)
+
+		fmt.Println(fmt.Sprintf("Name : %s \t Last Callback: %s \t First Callback: %s",agent.Name,LastCallback.String(),FirstCallback.String()))
 	}
 }
 
@@ -134,7 +139,7 @@ func StartHTTPListener(port int)  {
 	listener.HandleFunc("/commands/{agent}",GetCommands).Methods("GET")
 	listener.HandleFunc("/data/{agent}",PrintData).Methods("POST")
 	server := &http.Server{
-		Addr:fmt.Sprintf("127.0.0.1:%d",port),
+		Addr:fmt.Sprintf(":%d",port),
 		Handler:listener,
 	}
 	server.ListenAndServe()
